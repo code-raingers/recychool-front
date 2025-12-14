@@ -124,5 +124,13 @@ const GlobalStyle = createGlobalStyle`
     border: none;
   }
 
+  a, a:visited, a:hover, a:active, a:focus {
+    color: inherit;
+    text-decoration: none;
+  }
+  a:focus {
+    outline: none;
+  }
+
 `;
 export default GlobalStyle;

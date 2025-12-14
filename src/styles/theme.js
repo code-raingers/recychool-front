@@ -2,61 +2,31 @@ const theme = {};
 theme.PALETTE = {
   primary: {
     green: {
-      main: "#00d674",
-      light: "#4dd998",
-      dark: "#00a35a",
-      gray: "#8A918e",
-      lightGray: "#e3e6e4",
-      darkGray: "#464d4a",
+      main: "#70C60C",
+      light: "#EFFBEA",
+    }},
+  secondary:{
+    purple: {
+      main: "#6578F7",
+      light: "#E8EBFF"
     },
     blue: {
-      main: "#2f96fd",
-      light: "#6fb7fd",
-      dark: "#006fd6",
-      gray: "#8c9197",
-      lightGray: "#e4e6e8",
-      darkGray: "#494c4f",
+      main: "#2993F7",
+      light: "#E5F4FC",
     },
-    purple: {
-      main: "#7255ee",
-      light: "#9585f2",
-      dark: "#6434b1",
-      gray: "#929196",
-      lightGray: "#e4e3e6",
-      darkGray: "#4a4a4d",
+    orange: {
+      main: "#F2A413",
+      light: "#FFF6E8",
     },
-    yellow: {
-      main: "#ffc600",
-      light: "#ffd84d",
-      dark: "#cc9e00",
-      gray: "#93918c",
-      lightGray: "#e7e6e3",
-      darkGray: "#4e4d4b",
+    pink: {
+      main: "#FF6888",
+      light: "#FFEFFA",
     },
-    red: {
-      main: "#ff4320",
-      light: "#ff7a65",
-      dark: "#d61f00",
-      gray: "#999190",
-      lightGray: "#e6e4e4",
-      darkGray: "#504d4d",
-    },
-  },
-  card: {
-    red: "#ffd0c7",
-    orange: "#f8ddc4",
-    yellow: "#fff0bf",
-    blue: "#cbe1fe",
-    purple: "#eae7fc",
-    green: "#bff4dc",
-    black: "#d0d0d0",
-    aqua: "#d4fbff",
   },
   neutral: {
     black: {
-      main: "#121212",
-      secondary: "#4d4d4d",
-      disable: "#999999",
+      main: "#333333",
+      secondary: "#666666",
     },
     gray: {
       main: "#808080",
@@ -64,15 +34,13 @@ theme.PALETTE = {
       dark: "#4d4d4d",
     },
     white: {
-      main: "#f1f1f1",
-      secondary: "#f5f5f5",
-      dark: "#d9d9d9",
+      main: "#ffffff",
     },
   },
-  background: {
-    rooms: "linear-gradient(to right, #6D2FFD 0%, #7255EE 38%, #AB4BFF 100%)",
-    ready:
-      "linear-gradient(to right, rgba(149,133,242,0.3) 0%, rgba(107,76,246,0.1) 100%)",
+  warn:{
+    red: {
+      main: "#E50909"
+    }
   },
 };
 
