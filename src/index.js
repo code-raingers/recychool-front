@@ -8,7 +8,7 @@ import store from './store';
 import reportWebVitals from './reportWebVitals';
 import GlobalStyle from "./styles/global";
 import theme from "./styles/theme";
-import { ThemeProvider } from "styled-components";
+
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
