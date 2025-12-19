@@ -5,13 +5,13 @@ import { h6Bold } from "../../../../styles/common";
 const S = {};
 
 S.HeaderWrap = styled.div`
-    width: 1900px;
+    /* width: 1900px; */
     display: flex;
     justify-content: center;
     align-items: center;
 `
 S.InnerWrap = styled.div`
-    width: 1400px;
+    width: 1160px;
     height: 82px;
     display: flex;
     justify-content: space-between;

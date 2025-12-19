@@ -1,45 +1,52 @@
 import React, { useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import S from "./style";
 import PaymentForm from "./PaymentForm";
 import PaymentSummary from "./PaymentSummary";
-import S from "./style";
+
+import * as PortOne from "@portone/browser-sdk/v2";
+
 
 const Payment = () => {
-  const { schoolId } = useParams();
+  const [payType, setPayType] = useState("GENERAL");
 
-  // 더미(나중에 API로 교체)
-  const school = useMemo(
-    () => ({
-      id: Number(schoolId),
-      name: "강천초결운분교장",
-      address: "경기도 여주시 강천면 마감로117-14",
-    }),
-    [schoolId]
-  );
+  // 더미 데이터
+  const user = { name: "홍길동", email: "test@test.com", phone: "010-0000-0000" };
+  const school = { name: "동탄초등학교", address: "서울시 강남구" };
+  const reserve = { reserveType: "PARKING", startDate: "2026-01-12" }; 
 
-  // ✅ reserve undefined 방지
-  const [reserve, setReserve] = useState({
-    reserveType: "PARKING", // "PLACE" | "PARKING"
-    startDate: "12월 23일",
-    endDate: "",
-    price: 50000,
-    deposit: 0,
-  });
+  const totalPrice = useMemo(() => {
+    return reserve.reserveType === "PARKING" ? 300 : 500;
+  }, [reserve.reserveType]);
 
-  const [user, setUser] = useState({
-    name: "홍길동",
-    email: "hgd12345@gmail.com",
-    phone: "010-2222-4444",
-  });
+const handlePay = async () => {
+  try {
+    const response = await PortOne.requestPayment({
+      storeId: "store-c5481931-3202-4119-b7f9-2d877d2e7ef1",         
+      channelKey: "channel-key-f7346641-df69-43cd-9724-16e58094f5ef",        
+      paymentId: `payment-${Date.now()}`,
+      orderName: "주차 예약 결제",
+      totalAmount: totalPrice,
+      currency: "KRW",
+      payMethod: payType === "GENERAL" ? "CARD" : payType,
+      customer: {
+        name: user.name,
+        email: user.email,
+        phoneNumber: user.phone,
+      },
+    });
 
-  const [payType, setPayType] = useState("TOSS"); // GENERAL | TOSS | KAKAO
+    // 결제 성공
+    console.log("결제 성공:", response);
+    console.log("paymentId:", response.paymentId);
 
-  const totalPrice = useMemo(() => Number(reserve.price || 0), [reserve.price]);
+  } catch (error) {
+    // 결제 실패 / 취소
+    console.error("결제 실패:", error);
+  }
+};
 
-  const onClickPay = () => {
-    // TODO: PortOne 연결
-    alert(`결제: schoolId=${schoolId}, type=${payType}, amount=${totalPrice}`);
-  };
+
+
 
   return (
     <S.Page>
@@ -47,9 +54,7 @@ const Payment = () => {
         <S.Left>
           <PaymentForm
             user={user}
-            setUser={setUser}
             reserve={reserve}
-            setReserve={setReserve}
             payType={payType}
             setPayType={setPayType}
           />
@@ -60,7 +65,7 @@ const Payment = () => {
             school={school}
             reserve={reserve}
             totalPrice={totalPrice}
-            onClickPay={onClickPay}
+            onClickPay={handlePay}
           />
         </S.Right>
       </S.Grid>

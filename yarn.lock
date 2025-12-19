@@ -1850,6 +1850,11 @@
   resolved "https://registry.yarnpkg.com/@popperjs/core/-/core-2.11.8.tgz#6b79032e760a0899cd4204710beede972a3a185f"
   integrity sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==
 
+"@portone/browser-sdk@^0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@portone/browser-sdk/-/browser-sdk-0.1.1.tgz#358acc92d8a955325fb68770de077e5746794e0a"
+  integrity sha512-5s3153gfgkICYqEo4KKZNIQLTfUBd7vTf0r4+Z8G1B8CQU2mwUw7VVUtdFDhnfABa1TvftErnME6FIgr2sApKQ==
+
 "@remix-run/router@1.23.1":
   version "1.23.1"
   resolved "https://registry.yarnpkg.com/@remix-run/router/-/router-1.23.1.tgz#0ce8857b024e24fc427585316383ad9d295b3a7f"

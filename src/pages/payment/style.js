@@ -1,31 +1,34 @@
 import styled from "styled-components";
-
 import * as C from "../../styles/common";
 
 const S = {};
 
 /* =============================
- * Page / Grid (1920 fixed)
+ * Page / Layout (1160 fixed, Left 560 / Gap 160 / Right 440)
  * ============================= */
 S.Page = styled.div`
   width: 100%;
 `;
 
+/* 1160 고정 + 가운데 정렬 + 좌우 고정 폭 + 간격 160 */
 S.Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(12, 80px);
-  column-gap: 40px;
-  padding: 0 260px;
-  align-items: start;
+  width: 1160px;
+  margin: 0 auto;
   box-sizing: border-box;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 160px;
 `;
 
 S.Left = styled.section`
-  grid-column: 1 / span 7;
+  width: 560px;
+  flex: 0 0 560px;
 `;
 
 S.Right = styled.aside`
-  grid-column: 8 / span 5;
+  width: 440px;
+  flex: 0 0 440px;
 `;
 
 /* =============================
@@ -200,20 +203,17 @@ S.SummaryVal = styled.div`
 `;
 
 S.SummaryValPrice = styled.div`
-  font-size: 26px;
-  font-weight: 900;
-  color: #ea6b7a; /* 피그마의 핑크/레드 느낌 */
+  ${C.h4Bold}
   text-align: right;
 `;
 
-/* 결제하기 버튼 (피그마 그린) */
 S.PayButton = styled.button`
   width: 100%;
   height: 64px;
   margin-top: 44px;
   border: none;
   border-radius: 10px;
-  background: #8bc34a;
+  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
   color: #fff;
   font-size: 20px;
   font-weight: 900;
