@@ -23,9 +23,20 @@ S.Button = styled.button`
   width: 440px;
   height: 40px;
   border-radius: 4px;
+  border: none;
   background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
   color: ${({ theme }) => theme.PALETTE.neutral.white.main};
+  cursor: pointer;
   ${h6Bold}
+  
+  &:hover:not(:disabled) {
+    opacity: 0.9;
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
 `
 S.Form =styled.form`
   display: flex;

@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { h3Light, h5Bold, h5Medium, h6Light } from '../../../styles/common';
+import { h3Bold, h3Light, h5Bold, h5Medium, h6Bold, h6Light, h6Medium } from '../../../styles/common';
+import { Link, NavLink } from 'react-router-dom';
 const S = {};
 
 S.LayOut = styled.div`
@@ -31,7 +32,6 @@ S.TapWrap = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   margin: 36px 0;
   :hover{
     cursor: pointer;
@@ -77,4 +77,34 @@ S.ModalOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 `
+S.ButtonWrap = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 40px;
+`
+S.ButtonLogin = styled.div`
+  width: 320px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
+  color: #ffffff;
+  ${h6Bold}
+  border-radius: 4px;
+`
+S.ButtonMain = styled.div`
+  width: 320px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ theme }) => theme.PALETTE.primary.green.light};
+  color: #666;
+  ${h6Bold}
+  border-radius: 4px;
+`
+
+
 export default S;

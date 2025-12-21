@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { h3Bold, h5Medium, h6Bold, h6Light, h6Medium } from '../../styles/common';
+import { h3Bold, h5Bold, h5Medium, h6Bold, h6Light, h6Medium } from '../../styles/common';
 import { Link, NavLink } from 'react-router-dom';
 const S = {};
 
@@ -68,5 +68,18 @@ S.ChildrenLayOut = styled.div`
   flex-direction: column;
   align-items: baseline;
 `
-
+S.NextStep = styled.div`
+  width: 680px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  ${h5Bold}
+  color: #fff;
+  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
+  border-radius: 4px;
+  :hover{
+    cursor: pointer;
+  }
+`
 export default S;

@@ -21,12 +21,34 @@ const Header = () => {
     userProvider: "",
   }
 
-  const onLogout = (() => {
-    localStorage.removeItem("accessToken")
-    dispatch(setUser(defaultUser))
-    dispatch(setUserStatus(false))
-    navigate("/sign-in")
-  })
+  const handleLogOutOnClick = async () => {
+    const accessToken = localStorage.getItem("accessToken"); // 너희 저장 위치에 맞게 바꿔
+
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/private/users/logout`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        }
+      }
+    );
+    const data = await res.json().catch(() => null);
+    if (!res.ok) {
+      console.error("로그아웃 실패:", data);
+      alert("로그아웃에 실패했습니다.");
+      return;
+    }
+    // 클라에서도 accessToken 제거 (서버는 블랙리스트 처리하지만 클라도 정리)
+    localStorage.removeItem("accessToken");
+    dispatch(setUser(defaultUser));
+    dispatch(setUserStatus(false));
+    navigate("/sign-in");
+    alert("로그아웃되었습니다.");
+  }
+  
   return (
     <S.HeaderWrap>
       <S.InnerWrap>
@@ -43,7 +65,7 @@ const Header = () => {
                 <Link to={"/my-page"}>마이페이지</Link>
               </S.MyPageWrap>
               <S.LogOut>
-                <div onClick={onLogout}>로그아웃</div>
+                <div onClick={handleLogOutOnClick}>로그아웃</div>
               </S.LogOut>
             </>
           ) : (

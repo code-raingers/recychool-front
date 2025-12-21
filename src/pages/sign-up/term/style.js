@@ -1,9 +1,10 @@
 import styled from 'styled-components';
-import { h3Light, h5Bold, h5Medium, h6Light } from '../../../styles/common';
+import { h3Bold, h3Light, h5Bold, h5Medium, h6Bold, h6Light, h6Medium } from '../../../styles/common';
+import { Link, NavLink } from 'react-router-dom';
 const S = {};
 
 S.LayOut = styled.div`
-  width: 620px;
+  width: 680px;
   display: flex;
   margin: 0 auto;
   flex-direction: column;
@@ -31,7 +32,6 @@ S.TapWrap = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
   margin: 36px 0;
   :hover{
     cursor: pointer;
@@ -66,6 +66,7 @@ S.NextStep = styled.div`
   :hover{
     cursor: pointer;
   }
+  margin-top: 24px;
 `
 
 S.ModalOverlay = styled.div`
@@ -77,4 +78,5 @@ S.ModalOverlay = styled.div`
   background-color: rgba(0, 0, 0, 0.5);
   z-index: 999;
 `
+
 export default S;
