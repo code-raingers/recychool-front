@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
 import S from "./style";
 import PaymentForm from "./PaymentForm";
 import PaymentSummary from "./PaymentSummary";
@@ -6,48 +7,93 @@ import * as PortOne from "@portone/browser-sdk/v2";
 
 const Payment = () => {
   const [payType, setPayType] = useState("GENERAL");
+  const [user, setUser] = useState(null);
+  const [school, setSchool] = useState(null);
+  const [reserve, setReserve] = useState(null);
 
-  // 더미 데이터
-  const user = { name: "장보고", email: "ABC@test.com", phone: "010-0000-0000" };
-  const school = { name: "삼성초등학교", address: "서울시 종로구" };
-  const reserve = { id: 3, reserveType: "PLACE", startDate: "2026-01-17" };
+  const { reserveId } = useParams();
+
+  useEffect(() => {
+
+    const getReserve = async () => {
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/private/payment/page?reserveId=${reserveId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      if (!res.ok) {
+        console.log("예약 조회 실패", res.status);
+        return;
+      }
+
+      const json = await res.json();     
+      const dto = json.data;            
+
+      setUser({                         
+        name: dto.userName,
+        email: dto.userEmail,
+        phone: dto.userPhone,
+      });
+
+      setSchool({                       
+        name: dto.schoolName,
+        address: dto.schoolAddress,
+      });
+
+      setReserve({                   
+        id: dto.reserveId,   
+        reserveType: dto.reserveType,
+        startDate: dto.startDate,
+        amount: dto.amount, 
+      });
+    };
+
+    getReserve(); 
+  }, [reserveId]); 
 
   const totalPrice = useMemo(() => {
-    return reserve.reserveType === "PARKING" ? 30000 : 50000;
-  }, [reserve.reserveType]);
+    if (!reserve) return 0; 
+    return reserve.amount ?? (reserve.reserveType === "PARKING" ? 30000 : 50000);
+  }, [reserve]);
+
+  if (!user || !school || !reserve) return null;
 
   const getPortOnePayType = () => {
-  if (payType === "GENERAL") {
-    return {
-      channelKey: process.env.REACT_APP_PORTONE_CHANNEL_CARD,
-      payMethod: "CARD",
-      easyPayProvider: null,
-    };
-  }
+    if (payType === "GENERAL") {
+      return {
+        channelKey: process.env.REACT_APP_PORTONE_CHANNEL_CARD,
+        payMethod: "CARD",
+        easyPayProvider: null,
+      };
+    }
 
-  if (payType === "KAKAO") {
-    return {
-      channelKey: process.env.REACT_APP_PORTONE_CHANNEL_KAKAOPAY,
-      payMethod: "EASY_PAY",
-      easyPayProvider: "KAKAOPAY",
-    };
-  }
+    if (payType === "KAKAO") {
+      return {
+        channelKey: process.env.REACT_APP_PORTONE_CHANNEL_KAKAOPAY,
+        payMethod: "EASY_PAY",
+        easyPayProvider: "KAKAOPAY",
+      };
+    }
 
-  if (payType === "TOSS") {
-    return {
-      channelKey: process.env.REACT_APP_PORTONE_CHANNEL_TOSSPAY,
-      payMethod: "EASY_PAY",
-      easyPayProvider: "TOSSPAY",
-    };
-  }
+    if (payType === "TOSS") {
+      return {
+        channelKey: process.env.REACT_APP_PORTONE_CHANNEL_TOSSPAY,
+        payMethod: "EASY_PAY",
+        easyPayProvider: "TOSSPAY",
+      };
+    }
 
-  throw new Error(`Unknown payType: ${payType}`);
-};
+    throw new Error(`Unknown payType: ${payType}`);
+  };
 
   const handlePay = async () => {
     try {
       const paymentId = `payment-${Date.now()}`;
-
       const { channelKey, payMethod, easyPayProvider } = getPortOnePayType();
 
       if (!channelKey) {
@@ -55,19 +101,18 @@ const Payment = () => {
         return;
       }
 
-
       const paymentRequest = {
         storeId: process.env.REACT_APP_PORTONE_STORE_ID,
         channelKey,
         paymentId,
         orderName: reserve.reserveType === "PARKING" ? "주차 예약 결제" : "장소 대여 결제",
         totalAmount: totalPrice,
-        currency: "CURRENCY_KRW", 
+        currency: "CURRENCY_KRW",
         payMethod,
         customer: {
-          fullName: user.name,      
+          fullName: user.name,
           email: user.email,
-          phoneNumber: user.phone,
+          phoneNumber: String(user.phone ?? ""),
         },
       };
 
@@ -82,7 +127,7 @@ const Payment = () => {
         return;
       }
 
-      const impUid = response.paymentId; 
+      const impUid = response.paymentId;
       const merchantUid = paymentId;
 
       const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/private/payment/complete`, {

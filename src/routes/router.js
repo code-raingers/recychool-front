@@ -24,6 +24,7 @@ import PasswordChange from "../pages/find/find-password/info/PasswordChange";
 import FindPasswordComplete from "../pages/find/find-password/complete/FindPasswordComplete";
 import Movie from "../pages/movie/Movie";
 import MyPage from "../pages/mypage/MyPage";
+import CompleteConfirm from "../pages/payment/CompleteConfirm";
 
 
 const router = createBrowserRouter([
@@ -117,8 +118,12 @@ const router = createBrowserRouter([
         element: <Reserve reserveType="PARKING" />
       },
       {
-        path: "payment/:schoolId",
+        path: "payment/:reserveId",
         element: <Payment />
+      },
+      {
+        path: "complete/:reserveId",
+        element: <CompleteConfirm />
       }
     ],
   },
