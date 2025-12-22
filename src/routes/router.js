@@ -8,7 +8,6 @@ import NotFound from "../pages/notfound/NotFound";
 import Search from "../pages/Search";
 import SignUp from "../pages/sign-up/SignUp";
 import FindUser from "../pages/find/FindUser";
-import MyPage from "../pages/MyPage";
 import Reserve from "../pages/reserve/Reserve";
 import Payment from "../pages/payment/Payment";
 import Main from "../pages/main/Main";
