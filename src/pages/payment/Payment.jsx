@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import S from "./style";
 import PaymentForm from "./PaymentForm";
@@ -7,15 +7,17 @@ import PaymentSummary from "./PaymentSummary";
 import * as PortOne from "@portone/browser-sdk/v2";
 
 const Payment = () => {
+  const navigate = useNavigate();
+
   const [payType, setPayType] = useState("GENERAL");
   const [school, setSchool] = useState(null);
   const [reserve, setReserve] = useState(null);
 
   const { reserveId } = useParams();
-
+  const isExtend =
+    new URLSearchParams(window.location.search).get("extend") === "true";
 
   const reduxUser = useSelector((state) => state.user.currentUser);
-  console.log(reduxUser)
 
   const user = useMemo(() => {
     return {
@@ -24,6 +26,31 @@ const Payment = () => {
       phone: reduxUser?.userPhone ?? "",
     };
   }, [reduxUser]);
+
+  console.log(reduxUser)
+
+
+  const addOneDay = (yyyyMMdd) => {
+    const [y, m, d] = yyyyMMdd.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setDate(date.getDate() + 1);
+
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  };
+
+  const addOneMonth = (yyyyMMdd) => {
+    const [y, m, d] = yyyyMMdd.split("-").map(Number);
+    const date = new Date(y, m - 1, d);
+    date.setMonth(date.getMonth() + 1);
+
+    const yy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, "0");
+    const dd = String(date.getDate()).padStart(2, "0");
+    return `${yy}-${mm}-${dd}`;
+  };
 
   useEffect(() => {
     const getReserve = async () => {
@@ -45,22 +72,33 @@ const Payment = () => {
       const json = await res.json();
       const dto = json.data;
 
-
       setSchool({
         name: dto.schoolName,
         address: dto.schoolAddress,
       });
 
+
+      const isParking = dto.reserveType === "PARKING";
+
+      let startDate = dto.startDate;
+      let endDate = dto.endDate;
+
+      if (isExtend && isParking && dto.endDate) {
+        startDate = addOneDay(dto.endDate);
+        endDate = addOneMonth(startDate);
+      }
+
       setReserve({
         id: dto.reserveId,
         reserveType: dto.reserveType,
-        startDate: dto.startDate,
+        startDate,
+        endDate,       
         amount: dto.amount,
       });
     };
 
     getReserve();
-  }, [reserveId]);
+  }, [reserveId, isExtend]);
 
   const totalPrice = useMemo(() => {
     if (!reserve) return 0;
@@ -77,7 +115,6 @@ const Payment = () => {
         easyPayProvider: null,
       };
     }
-
     if (payType === "KAKAO") {
       return {
         channelKey: process.env.REACT_APP_PORTONE_CHANNEL_KAKAOPAY,
@@ -85,7 +122,6 @@ const Payment = () => {
         easyPayProvider: "KAKAOPAY",
       };
     }
-
     if (payType === "TOSS") {
       return {
         channelKey: process.env.REACT_APP_PORTONE_CHANNEL_TOSSPAY,
@@ -93,7 +129,6 @@ const Payment = () => {
         easyPayProvider: "TOSSPAY",
       };
     }
-
     throw new Error(`Unknown payType: ${payType}`);
   };
 
@@ -111,12 +146,12 @@ const Payment = () => {
         storeId: process.env.REACT_APP_PORTONE_STORE_ID,
         channelKey,
         paymentId,
-        orderName: reserve.reserveType === "PARKING" ? "주차 예약 결제" : "장소 대여 결제",
+        orderName:
+          reserve.reserveType === "PARKING" ? "주차 예약 결제" : "장소 대여 결제",
         totalAmount: totalPrice,
         currency: "CURRENCY_KRW",
         payMethod,
         customer: {
-
           fullName: user.name,
           email: user.email,
           phoneNumber: String(user.phone ?? ""),
@@ -134,36 +169,35 @@ const Payment = () => {
         return;
       }
 
-      const impUid = response.paymentId; 
+      const impUid = response.paymentId;
       const merchantUid = paymentId;
 
-      const res = await fetch(`${process.env.REACT_APP_BACKEND_URL}/private/payment/complete`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
-        body: JSON.stringify({
-          reserveId: reserve.id,
-          impUid,
-          merchantUid,
-          paymentType: payType,
-        }),
-      });
+      const res = await fetch(
+        `${process.env.REACT_APP_BACKEND_URL}/private/payment/complete`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+          body: JSON.stringify({
+            reserveId: reserve.id,
+            impUid,
+            merchantUid,
+            paymentType: payType,
+            extend: isExtend,
+          }),
+        }
+      );
 
       if (!res.ok) {
         alert("결제 처리에 실패했습니다.");
         return;
       }
 
-      const serverData = await res.json();
-      console.log("서버 결제 완료 응답:", serverData);
+      await res.json();
       alert("결제가 완료되었습니다.");
-
-
-      
-
-
+      navigate(`/complete/${reserve.id}`);
     } catch (error) {
       console.error("결제 실패:", error);
       alert("결제가 실패(또는 취소)되었습니다.");
