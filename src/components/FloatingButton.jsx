@@ -8,7 +8,7 @@ const FloatingButton = () => {
   const toggleMenu = () => {
     setOpen((prev) => !prev);
     if (open) {
-    setSchoolOpen(false);
+      setSchoolOpen(false);
     }
   }
 
