@@ -1,7 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import S from "./style";
-
 
 const formatKoreanDate = (yyyyMMdd) => {
   if (!yyyyMMdd) return "-";
@@ -19,44 +18,52 @@ const CompleteConfirm = () => {
   const navigate = useNavigate();
   const { reserveId } = useParams();
 
+  const [dto, setDto] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const data = useMemo(() => {
-    const isParking = Number(reserveId) % 2 === 0;
+  useEffect(() => {
+    const fetchReserve = async () => {
+      try {
+        setLoading(true);
 
-    if (isParking) {
-      return {
-        reserveType: "PARKING",
-        reserverName: "홍길동",
-        schoolName: "강천초겸은분교장",
-        startDate: "2025-01-01",
-        endDate: "2025-02-01",
-        price: 50000,
-        statusText: "결제 완료",
-      };
-    }
+        const res = await fetch(
+          `${process.env.REACT_APP_BACKEND_URL}/private/payment/page?reserveId=${reserveId}`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+            },
+          }
+        );
 
-    return {
-      reserveType: "PLACE",
-      reserverName: "홍길동",
-      schoolName: "강천초겸은분교장",
-      startDate: "2025-05-05",
-      endDate: null,
-      price: 50000,
-      statusText: "결제 완료",
+        if (!res.ok) {
+          console.log("예약 조회 실패", res.status);
+          setDto(null);
+          return;
+        }
+
+        const json = await res.json();
+        setDto(json.data);
+      } finally {
+        setLoading(false);
+      }
     };
+
+    fetchReserve();
   }, [reserveId]);
 
-  const isParking = data.reserveType === "PARKING";
+  if (loading) return null;
+  if (!dto) return null;
 
-  const title = isParking ? "주차 예약 내역" : "장소 대여 예약 내역";
+  const isParking = dto.reserveType === "PARKING";
+  const title = isParking ? "주차 예약 내역" : "장소 예약 내역";
+
   const dateText = isParking
-    ? formatRange(data.startDate, data.endDate)
-    : formatKoreanDate(data.startDate);
+    ? formatRange(dto.startDate, dto.endDate)
+    : formatKoreanDate(dto.startDate);
 
-  const leftButtonText = isParking ? "이용 내역 보러가기" : "예약 내역 보러가기";
-// data 
-//  data.type === "reserve" ? <>예약 랜더 </> : <> 주차랜더 </>
-//  data.type === "reserve" ? <>예약 랜더 </> : data.type === "movie" ? <> 영화 랜더 </> : <>주차 랜더</>
+  const leftButtonText = isParking ? "연장 하기" : "예약 취소";
+
   return (
     <S.Page>
       <S.CompleteWrap>
@@ -66,8 +73,8 @@ const CompleteConfirm = () => {
 
           <S.CompleteTable>
             <S.CompleteRow>
-              <S.CompleteTh>사용자</S.CompleteTh>
-              <S.CompleteTd>{data.reserverName}</S.CompleteTd>
+              <S.CompleteTh>예약자명</S.CompleteTh>
+              <S.CompleteTd>{dto.userName}</S.CompleteTd>
             </S.CompleteRow>
 
             <S.CompleteRow>
@@ -77,22 +84,34 @@ const CompleteConfirm = () => {
 
             <S.CompleteRow>
               <S.CompleteTh>학교명</S.CompleteTh>
-              <S.CompleteTd>{data.schoolName}</S.CompleteTd>
+              <S.CompleteTd>{dto.schoolName}</S.CompleteTd>
             </S.CompleteRow>
 
             <S.CompleteRow>
               <S.CompleteTh>이용요금</S.CompleteTh>
-              <S.CompleteTd>{data.price.toLocaleString()}원</S.CompleteTd>
+              <S.CompleteTd>
+                {Number(dto.amount).toLocaleString()}원
+              </S.CompleteTd>
             </S.CompleteRow>
 
             <S.CompleteRow>
               <S.CompleteTh>결제상태</S.CompleteTh>
-              <S.CompleteTd>{data.statusText}</S.CompleteTd>
+              <S.CompleteTd>결제 완료</S.CompleteTd>
             </S.CompleteRow>
           </S.CompleteTable>
 
           <S.CompleteButtonRow>
-            <S.CompletePrimaryButton type="button" onClick={() => navigate("/my-page")}>
+            <S.CompletePrimaryButton
+              type="button"
+              onClick={() => {
+                if (isParking) {
+                  // 연장 결제
+                  navigate(`/payment/${reserveId}?extend=true`);
+                } else {
+                  navigate("/my-page");
+                }
+              }}
+            >
               {leftButtonText}
             </S.CompletePrimaryButton>
 

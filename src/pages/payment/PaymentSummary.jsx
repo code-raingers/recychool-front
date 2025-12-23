@@ -20,6 +20,9 @@ const PaymentSummary = ({ school, reserve, totalPrice, onClickPay }) => {
           <S.SummaryKey>시작날짜</S.SummaryKey>
           <S.SummaryVal>{reserve.startDate || "-"}</S.SummaryVal>
 
+          <S.SummaryKey>종료날짜</S.SummaryKey>
+          <S.SummaryVal>{reserve.endDate || "-"}</S.SummaryVal>
+
           <S.SummaryKey>목적</S.SummaryKey>
           <S.SummaryVal>{purposeLabel}</S.SummaryVal>
 
