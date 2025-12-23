@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import S from './style';
+import { useSelector } from "react-redux";
+
 
 const Movie = () => {
   const API = process.env.REACT_APP_BACKEND_URL;
+  const currentUser = useSelector((state) => state.user?.currentUser);
+  const userId = currentUser?.id;
 
   const [schools, setSchools] = useState([]);
   const [selectedSchoolId, setSelectedSchoolId] = useState(null);
@@ -53,31 +57,51 @@ const Movie = () => {
   }, [selectedSchoolId]);
 
 
-  const handleReservation = async () => {
-    if (!selectedSchoolId) {
-      alert("학교를 먼저 선택해주세요!");
-      return;
+const handleReservation = async () => {
+  if (!userId) {
+    alert("로그인이 필요합니다! (Redux에 currentUser가 없어요)");
+    // 원하면 로그인 페이지로 이동
+    // navigate("/sign-in");
+    return;
+  }
+
+  if (!selectedSchoolId) {
+    alert("학교를 먼저 선택해주세요!");
+    return;
+  }
+
+  try {
+    const movieTitle = encodeURIComponent("코렐라인");
+    const url = `${API}/reservations/write?schoolId=${selectedSchoolId}&movieTitle=${movieTitle}&userId=${userId}`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      credentials: "include", // ✅ 로그인 쿠키/세션 쓰면 필수
+    });
+
+    // 서버가 JSON이 아니라 HTML을 줄 때도 있어서 안전하게 처리
+    const contentType = res.headers.get("content-type") || "";
+    let data = null;
+
+    if (contentType.includes("application/json")) {
+      data = await res.json();
+    } else {
+      const text = await res.text();
+      console.error("JSON 아닌 응답:", text.slice(0, 300));
     }
 
-    try {
-      // 쿼리 파라미터 방식으로 전송 (백엔드 @RequestParam에 맞춤)
-      const url = `${API}/reservations/write?schoolId=${selectedSchoolId}&movieTitle=코렐라인&userId=1`;
-      const res = await fetch(url, {
-        method: 'POST',
-      });
-
-      if (res.ok) {
-        alert("예약 성공!");
-        fetchRemainingSeats(); 
-      } else {
-        const errorData = await res.json().catch(() => null);
-        alert(errorData?.message || "예약 실패... 다시 시도해주세요.");
-      }
-    } catch (error) {
-      console.error(error);
-      alert("서버 오류가 발생했습니다.");
+    if (res.ok) {
+      alert("예약 성공!");
+      fetchRemainingSeats();
+    } else {
+      alert(data?.message || `예약 실패 (status=${res.status})`);
     }
-  };
+  } catch (error) {
+    console.error(error);
+    alert("서버 오류가 발생했습니다.");
+  }
+};
+
 
   return (
     <div>
