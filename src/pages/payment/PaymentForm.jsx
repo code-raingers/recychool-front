@@ -17,9 +17,6 @@ const PaymentForm = ({ user, reserve, payType, setPayType }) => {
           <S.InfoValue>{user.name}</S.InfoValue>
           <S.InfoLabel>이메일</S.InfoLabel>
           <S.InfoValue>{user.email}</S.InfoValue>
-
-          <S.InfoLabel>휴대폰</S.InfoLabel>
-          <S.InfoValue>{user.phone}</S.InfoValue>
         </S.InfoGrid>
       </S.Block>
 

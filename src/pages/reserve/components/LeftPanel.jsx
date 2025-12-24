@@ -1,25 +1,33 @@
 import S from "../style";
 import ReservationCalendar from "./ReservationCalendar";
 
-const LeftPanel = ({ data, selectedDate, onDateSelect }) => {
+const LeftPanel = ({
+  data,
+  selectedDate,
+  onDateSelect,
+  dateCountMap, 
+}) => {
+  if (!data) return null;
   return (
     <S.LeftPanel>
       <S.Title>{data.schoolName}</S.Title>
 
-    <S.ImageBox>
-      {data.schoolImageName && (
-        <img
-          src={`http://localhost:10000/images/${encodeURIComponent(data.schoolImageName)}`}
-          alt={data.schoolName}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: "12px",
-          }}
-        />
-      )}
-    </S.ImageBox>
+      <S.ImageBox>
+        {data.schoolImageName && (
+          <img
+            src={`http://localhost:10000/images/${encodeURIComponent(
+              data.schoolImageName
+            )}`}
+            alt={data.schoolName}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "12px",
+            }}
+          />
+        )}
+      </S.ImageBox>
 
       <S.CalendarBox>
         <ReservationCalendar
@@ -28,7 +36,7 @@ const LeftPanel = ({ data, selectedDate, onDateSelect }) => {
           reserveType={data.reserveType}
           unavailableDates={data.unavailableDates || []}
           maxCapacity={data.maxParkingCapacity}
-          dateCountMap={data.dateCountMap} 
+          dateCountMap={dateCountMap} 
         />
       </S.CalendarBox>
     </S.LeftPanel>

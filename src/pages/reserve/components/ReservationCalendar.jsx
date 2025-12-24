@@ -77,7 +77,6 @@ function CustomDay(props) {
         }}
       />
 
-      {/* ✅ PARKING일 때만 숫자 표시 */}
       {!outsideCurrentMonth && reserveType === "PARKING" && (
         <CountText $full={isFull}>
           {displayCount}/{displayMax}

@@ -22,12 +22,13 @@ const Payment = () => {
   const user = useMemo(() => {
     return {
       name: reduxUser?.userName ?? "",
-      email: reduxUser?.userEmail ?? "",
-      phone: reduxUser?.userPhone ?? "",
+      email: reduxUser?.userEmail ?? ""
     };
   }, [reduxUser]);
 
   console.log(reduxUser)
+
+
 
 
   const addOneDay = (yyyyMMdd) => {
@@ -153,8 +154,7 @@ const Payment = () => {
         payMethod,
         customer: {
           fullName: user.name,
-          email: user.email,
-          phoneNumber: String(user.phone ?? ""),
+          email: user.email
         },
       };
 
@@ -181,12 +181,13 @@ const Payment = () => {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify({
-            reserveId: reserve.id,
-            impUid,
-            merchantUid,
-            paymentType: payType,
-            extend: isExtend,
-          }),
+          reserveId: reserve.id,
+          impUid: impUid,
+          merchantUid: merchantUid,
+          paymentType: payType,
+          amount: totalPrice,   
+          extend: isExtend,
+        }),
         }
       );
 
@@ -197,7 +198,7 @@ const Payment = () => {
 
       await res.json();
       alert("결제가 완료되었습니다.");
-      navigate(`/complete/${reserve.id}`);
+      navigate(`/complete/${reserve.id}?extend=${isExtend}`);
     } catch (error) {
       console.error("결제 실패:", error);
       alert("결제가 실패(또는 취소)되었습니다.");

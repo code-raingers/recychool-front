@@ -52,6 +52,29 @@ const CompleteConfirm = () => {
     fetchReserve();
   }, [reserveId]);
 
+  const handleCancelReserve = async () => {
+  const ok = window.confirm("예약을 취소할까요?");
+  if (!ok) return;
+
+  const res = await fetch(
+    `${process.env.REACT_APP_BACKEND_URL}/private/schools/reserves/${reserveId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    alert("예약 취소에 실패했습니다.");
+    return;
+  }
+
+  alert("예약 취소가 완료되었습니다.");
+  navigate("/"); 
+};
+
   if (loading) return null;
   if (!dto) return null;
 
@@ -108,7 +131,7 @@ const CompleteConfirm = () => {
                   // 연장 결제
                   navigate(`/payment/${reserveId}?extend=true`);
                 } else {
-                  navigate("/my-page");
+                  handleCancelReserve();
                 }
               }}
             >
@@ -118,6 +141,8 @@ const CompleteConfirm = () => {
             <S.CompleteSecondaryButton type="button" onClick={() => navigate("/")}>
               메인 페이지로 이동
             </S.CompleteSecondaryButton>
+
+
           </S.CompleteButtonRow>
         </S.CompleteCard>
       </S.CompleteWrap>
