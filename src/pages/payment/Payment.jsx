@@ -1,74 +1,45 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import * as PortOne from "@portone/browser-sdk/v2";
+
 import S from "./style";
 import PaymentForm from "./PaymentForm";
 import PaymentSummary from "./PaymentSummary";
-import * as PortOne from "@portone/browser-sdk/v2";
 
 const Payment = () => {
   const navigate = useNavigate();
+  const { reserveId } = useParams();
 
   const [payType, setPayType] = useState("GENERAL");
   const [school, setSchool] = useState(null);
   const [reserve, setReserve] = useState(null);
 
-  const { reserveId } = useParams();
   const isExtend =
     new URLSearchParams(window.location.search).get("extend") === "true";
 
   const reduxUser = useSelector((state) => state.user.currentUser);
 
-  const user = useMemo(() => {
-    return {
+  const user = useMemo(
+    () => ({
       name: reduxUser?.userName ?? "",
-      email: reduxUser?.userEmail ?? ""
-    };
-  }, [reduxUser]);
-
-  console.log(reduxUser)
-
-
-
-
-  const addOneDay = (yyyyMMdd) => {
-    const [y, m, d] = yyyyMMdd.split("-").map(Number);
-    const date = new Date(y, m - 1, d);
-    date.setDate(date.getDate() + 1);
-
-    const yy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    return `${yy}-${mm}-${dd}`;
-  };
-
-  const addOneMonth = (yyyyMMdd) => {
-    const [y, m, d] = yyyyMMdd.split("-").map(Number);
-    const date = new Date(y, m - 1, d);
-    date.setMonth(date.getMonth() + 1);
-
-    const yy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, "0");
-    const dd = String(date.getDate()).padStart(2, "0");
-    return `${yy}-${mm}-${dd}`;
-  };
+      email: reduxUser?.userEmail ?? "",
+    }),
+    [reduxUser]
+  );
 
   useEffect(() => {
-    const getReserve = async () => {
+    const fetchReserve = async () => {
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/private/payment/page?reserveId=${reserveId}`,
         {
-          method: "GET",
           headers: {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
         }
       );
 
-      if (!res.ok) {
-        console.log("예약 조회 실패", res.status);
-        return;
-      }
+      if (!res.ok) return;
 
       const json = await res.json();
       const dto = json.data;
@@ -78,32 +49,21 @@ const Payment = () => {
         address: dto.schoolAddress,
       });
 
-
-      const isParking = dto.reserveType === "PARKING";
-
-      let startDate = dto.startDate;
-      let endDate = dto.endDate;
-
-      if (isExtend && isParking && dto.endDate) {
-        startDate = addOneDay(dto.endDate);
-        endDate = addOneMonth(startDate);
-      }
-
       setReserve({
         id: dto.reserveId,
         reserveType: dto.reserveType,
-        startDate,
-        endDate,       
+        startDate: dto.startDate,
+        endDate: dto.endDate,
         amount: dto.amount,
       });
     };
 
-    getReserve();
-  }, [reserveId, isExtend]);
+    fetchReserve();
+  }, [reserveId]);
 
   const totalPrice = useMemo(() => {
     if (!reserve) return 0;
-    return reserve.amount ?? (reserve.reserveType === "PARKING" ? 300 : 500);
+    return reserve.amount;
   }, [reserve]);
 
   if (!reduxUser || !school || !reserve) return null;
@@ -113,7 +73,6 @@ const Payment = () => {
       return {
         channelKey: process.env.REACT_APP_PORTONE_CHANNEL_CARD,
         payMethod: "CARD",
-        easyPayProvider: null,
       };
     }
     if (payType === "KAKAO") {
@@ -130,7 +89,7 @@ const Payment = () => {
         easyPayProvider: "TOSSPAY",
       };
     }
-    throw new Error(`Unknown payType: ${payType}`);
+    throw new Error("Unknown payType");
   };
 
   const handlePay = async () => {
@@ -138,23 +97,20 @@ const Payment = () => {
       const paymentId = `payment-${Date.now()}`;
       const { channelKey, payMethod, easyPayProvider } = getPortOnePayType();
 
-      if (!channelKey) {
-        alert("channelKey가 없습니다. .env 설정을 확인하세요.");
-        return;
-      }
-
       const paymentRequest = {
         storeId: process.env.REACT_APP_PORTONE_STORE_ID,
         channelKey,
         paymentId,
         orderName:
-          reserve.reserveType === "PARKING" ? "주차 예약 결제" : "장소 대여 결제",
+          reserve.reserveType === "PARKING"
+            ? "주차 예약 결제"
+            : "장소 대여 결제",
         totalAmount: totalPrice,
         currency: "CURRENCY_KRW",
         payMethod,
         customer: {
           fullName: user.name,
-          email: user.email
+          email: user.email,
         },
       };
 
@@ -164,13 +120,17 @@ const Payment = () => {
 
       const response = await PortOne.requestPayment(paymentRequest);
 
+      // 결제창 종료 / 취소
       if (!response) {
         alert("결제가 취소되었습니다.");
         return;
       }
 
-      const impUid = response.paymentId;
-      const merchantUid = paymentId;
+      // 결제 성공 여부 검증
+      if (response.status !== "PAID") {
+        alert("결제가 완료되지 않았습니다.");
+        return;
+      }
 
       const res = await fetch(
         `${process.env.REACT_APP_BACKEND_URL}/private/payment/complete`,
@@ -181,13 +141,13 @@ const Payment = () => {
             Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
           },
           body: JSON.stringify({
-          reserveId: reserve.id,
-          impUid: impUid,
-          merchantUid: merchantUid,
-          paymentType: payType,
-          amount: totalPrice,   
-          extend: isExtend,
-        }),
+            reserveId: reserve.id,
+            impUid: response.paymentId,
+            merchantUid: paymentId,
+            paymentType: payType,
+            amount: totalPrice,
+            extend: isExtend,
+          }),
         }
       );
 
@@ -196,12 +156,11 @@ const Payment = () => {
         return;
       }
 
-      await res.json();
       alert("결제가 완료되었습니다.");
       navigate(`/complete/${reserve.id}?extend=${isExtend}`);
     } catch (error) {
-      console.error("결제 실패:", error);
-      alert("결제가 실패(또는 취소)되었습니다.");
+      console.error(error);
+      alert("결제 중 오류가 발생했습니다.");
     }
   };
 

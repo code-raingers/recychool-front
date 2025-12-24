@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import S from "./style";
 
@@ -13,6 +13,8 @@ const formatRange = (start, end) => {
   if (!end) return formatKoreanDate(start);
   return `${formatKoreanDate(start)} - ${formatKoreanDate(end)}`;
 };
+
+const ENABLE_DAYS_BEFORE = 7;
 
 const CompleteConfirm = () => {
   const navigate = useNavigate();
@@ -52,28 +54,57 @@ const CompleteConfirm = () => {
     fetchReserve();
   }, [reserveId]);
 
+  // 날짜 차이 계산(연장 버튼 활성화 판단용)
+  const canExtend = useMemo(() => {
+    if (!dto) return false;
+    if (dto.reserveType !== "PARKING") return false;
+    if (!dto.endDate) return false;
+
+    const [y, m, d] = dto.endDate.split("-").map(Number);
+    const end = new Date(y, m - 1, d);
+    end.setHours(0, 0, 0, 0);
+
+    const enable = new Date(end);
+    enable.setDate(enable.getDate() - ENABLE_DAYS_BEFORE);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // enableDate(종료일-7일)부터 종료일까지 활성화
+    return today >= enable && today <= end;
+  }, [dto]);
+
   const handleCancelReserve = async () => {
-  const ok = window.confirm("예약을 취소할까요?");
-  if (!ok) return;
+    const ok = window.confirm("예약을 취소할까요?");
+    if (!ok) return;
 
-  const res = await fetch(
-    `${process.env.REACT_APP_BACKEND_URL}/private/schools/reserves/${reserveId}`,
-    {
-      method: "DELETE",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-      },
+    const res = await fetch(
+      `${process.env.REACT_APP_BACKEND_URL}/private/schools/reserves/${reserveId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }
+    );
+
+    if (!res.ok) {
+      alert("예약 취소에 실패했습니다.");
+      return;
     }
-  );
 
-  if (!res.ok) {
-    alert("예약 취소에 실패했습니다.");
-    return;
-  }
+    alert("예약 취소가 완료되었습니다.");
+    navigate("/", { replace: true });
+  };
 
-  alert("예약 취소가 완료되었습니다.");
-  navigate("/"); 
-};
+  // 연장 결제 이동(7일 전부터만)
+  const handleGoExtend = () => {
+    if (!canExtend) {
+      alert(`연장은 종료일 ${ENABLE_DAYS_BEFORE}일 전부터 가능합니다.`);
+      return;
+    }
+    navigate(`/payment/${reserveId}?extend=true`);
+  };
 
   if (loading) return null;
   if (!dto) return null;
@@ -112,9 +143,7 @@ const CompleteConfirm = () => {
 
             <S.CompleteRow>
               <S.CompleteTh>이용요금</S.CompleteTh>
-              <S.CompleteTd>
-                {Number(dto.amount).toLocaleString()}원
-              </S.CompleteTd>
+              <S.CompleteTd>{Number(dto.amount).toLocaleString()}원</S.CompleteTd>
             </S.CompleteRow>
 
             <S.CompleteRow>
@@ -126,10 +155,10 @@ const CompleteConfirm = () => {
           <S.CompleteButtonRow>
             <S.CompletePrimaryButton
               type="button"
+              disabled={isParking ? !canExtend : false}
               onClick={() => {
                 if (isParking) {
-                  // 연장 결제
-                  navigate(`/payment/${reserveId}?extend=true`);
+                  handleGoExtend();
                 } else {
                   handleCancelReserve();
                 }
@@ -138,11 +167,12 @@ const CompleteConfirm = () => {
               {leftButtonText}
             </S.CompletePrimaryButton>
 
-            <S.CompleteSecondaryButton type="button" onClick={() => navigate("/")}>
+            <S.CompleteSecondaryButton
+              type="button"
+              onClick={() => navigate("/", { replace: true })}
+            >
               메인 페이지로 이동
             </S.CompleteSecondaryButton>
-
-
           </S.CompleteButtonRow>
         </S.CompleteCard>
       </S.CompleteWrap>
