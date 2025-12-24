@@ -80,19 +80,37 @@ S.SubFloatingButton3 = styled.div`
 
 S.SchoolFloationButton = styled.div`
   position: absolute;
-  right: 80px;        
+  right: 85px;      /* 학교 버튼 바로 옆 */
   top: 50%;
   transform: translateY(-50%);
 
   display: flex;
   gap: 16px;
 `;
+
+
 S.SchoolFloationButton1 = styled.div`
   width: 65px;
   height: 65px;
   border-radius: 50%;
-  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
 `;
+
+S.SchoolImage = styled.img`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+`;
+
+
+S.SchoolButtonWrapper = styled.div`
+  position: relative; 
+  display: flex;
+  align-items: center;
+`;
+
+
+
 S.SchoolFloationButton2 = styled.div`
   width: 65px;
   height: 65px;

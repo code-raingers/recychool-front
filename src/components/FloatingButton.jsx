@@ -14,14 +14,16 @@ const FloatingButton = () => {
 
   const [open, setOpen] = useState(false);
   const [placeList, setPlaceList] = useState([]);
+  const [isSchoolOpen, setIsSchoolOpen] = useState(false);
 
   /* 달력 버튼 */
   const toggleMenu = () => {
     setOpen(prev => !prev);
     setPlaceList([]);
+    setIsSchoolOpen(false);
   };
 
-  /* 행사 버튼 (쿠키 방식 유지 – 이미 잘 됨) */
+  /* 행사 버튼 */
   const handleEventClick = async () => {
     if (!userId) return;
 
@@ -44,7 +46,7 @@ const FloatingButton = () => {
     }
   };
 
-  /* 주차 버튼 (JWT 방식으로 수정) */
+  /* 주차 버튼 */
   const handleParkingClick = async () => {
     try {
       const res = await fetch(
@@ -69,8 +71,15 @@ const FloatingButton = () => {
     }
   };
 
-  /* 학교 버튼 (JWT 방식으로 수정) */
+  /* 학교 버튼 (토글) */
   const handleSchoolClick = async () => {
+    // 이미 열려 있으면 닫기
+    if (isSchoolOpen) {
+      setIsSchoolOpen(false);
+      setPlaceList([]);
+      return;
+    }
+
     try {
       const res = await fetch(
         `${BACKEND_URL}/private/schools/place/reserves`,
@@ -88,7 +97,8 @@ const FloatingButton = () => {
 
       if (list.length === 0) return;
 
-      setPlaceList(list); // [reserveId, reserveId]
+      setPlaceList(list);
+      setIsSchoolOpen(true);
     } catch (e) {
       console.error(e);
     }
@@ -97,32 +107,40 @@ const FloatingButton = () => {
   return (
     <S.FloatingWrapper>
 
-      {/* 학교 장소 가로 플로팅 */}
-      {placeList.length > 0 && (
-        <S.SchoolFloationButton>
-          {placeList.map((reserveId, index) => (
-            <S.SchoolFloationButton1
-              key={reserveId}
-              onClick={() => navigate(`/complete/${reserveId}`)}
-            >
-              {index + 1}
-            </S.SchoolFloationButton1>
-          ))}
-        </S.SchoolFloationButton>
-      )}
-
-      {/* 서브 플로팅 버튼 */}
       {open && (
         <S.SubFloatingButton>
 
-          <S.SubFloatingButton3 onClick={handleSchoolClick}>
-            <img src="/assets/images/schooll.png" alt="학교" />
-          </S.SubFloatingButton3>
+          {/*  학교 버튼 + 학교 이미지 */}
+          <S.SchoolButtonWrapper>
 
+            <S.SubFloatingButton3 onClick={handleSchoolClick}>
+              <img src="/assets/images/schooll.png" alt="학교" />
+            </S.SubFloatingButton3>
+
+            {isSchoolOpen && (
+              <S.SchoolFloationButton>
+                {placeList.map(item => (
+                  <S.SchoolFloationButton1
+                    key={item.reserveId}
+                    onClick={() => navigate(`/complete/${item.reserveId}`)}
+                  >
+                    <S.SchoolImage
+                      src={`${BACKEND_URL}/images/${item.schoolImageName}`}
+                      alt="학교"
+                    />
+                  </S.SchoolFloationButton1>
+                ))}
+              </S.SchoolFloationButton>
+            )}
+
+          </S.SchoolButtonWrapper>
+
+          {/* 행사 */}
           <S.SubFloatingButton2 onClick={handleEventClick}>
             <img src="/assets/images/event.png" alt="행사" />
           </S.SubFloatingButton2>
 
+          {/* 주차 */}
           <S.SubFloatingButton1 onClick={handleParkingClick}>
             <img src="/assets/images/car.png" alt="자동차" />
           </S.SubFloatingButton1>
@@ -130,7 +148,7 @@ const FloatingButton = () => {
         </S.SubFloatingButton>
       )}
 
-      {/* 달력 버튼 */}
+      {/* 달력 */}
       <S.FloatingButton onClick={toggleMenu}>
         <img src="/assets/images/calender.png" alt="달력" />
       </S.FloatingButton>
