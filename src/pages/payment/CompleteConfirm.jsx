@@ -37,6 +37,14 @@ const CompleteConfirm = () => {
             },
           }
         );
+        // const res = await fetch(
+        //   `${process.env.REACT_APP_BACKEND_URL}/private/payment/page?reserveId=${reserveId}`,
+        //   {
+        //     method: "GET",
+        //     credentials: "include", // ⭐ 이 한 줄이 핵심
+        //   }
+        // );
+
 
         if (!res.ok) {
           console.log("예약 조회 실패", res.status);
