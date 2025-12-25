@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react'; // useState 추가
 import { useSearchParams } from 'react-router-dom';
 import useOAuthCallback from '../../hooks/useOAuthCallback';
 import S from './style';
@@ -11,10 +11,17 @@ const Main = () => {
 
   useOAuthCallback(key);
 
+  const [searchRegion, setSearchRegion] = useState('');
+
+  const handleSearch = (region) => {
+    setSearchRegion(region);
+  };
+
   return (
     <div>
       <S.MainWrap>
-        <MainBanner />
+        <MainBanner onSearch={handleSearch} />
+        <MainCategorySide searchRegion={searchRegion} />
       </S.MainWrap>
     </div>
   );

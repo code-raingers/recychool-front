@@ -1,6 +1,6 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
-import { h5Bold, h6Bold, h6Medium, h7Medium, h8Light } from "../../../styles/common";
+import { h5Bold, h6Bold, h6Light, h6Medium, h7Light, h7Medium, h8Light } from "../../../styles/common";
 import { DatePicker } from "@mui/x-date-pickers";
 
 
@@ -62,6 +62,7 @@ S.IsClosedSchoolWrap = styled(Link)`
     }
 `
 
+
 S.SearchWrap = styled.div`
     position: absolute;
     top: 100%;
@@ -86,14 +87,12 @@ S.FieldItem = styled.div`
         padding: 2px 32px 0;
     }
     label {
-        ${h8Light}
+        ${h6Light}
         line-height: 2px;
         color: #222222;
             margin-top: 19px;
     }
-    #date-slt {
-        padding: 0px 32px
-    }
+    
 
     input {
         width: 100%;
@@ -104,10 +103,10 @@ S.FieldItem = styled.div`
         background: transparent;
         padding: 0;
         box-sizing: border-box;
+        margin: 0 10px;
         ${h6Medium}
     }
 `;
-
 
 S.Divider = styled.div`
     width: 1px;
@@ -119,7 +118,7 @@ S.SearchButton = styled.button`
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: #70C60C;
+    background:  ${({ theme }) => theme.PALETTE.primary.green.main};
     border: none;
     display: flex;
     align-items: center;
@@ -134,4 +133,8 @@ S.SearchButton = styled.button`
     }
 `;
 
+S.Wrap = styled.div`
+    height: auto;
+    margin: 10px;
+`
 export default S;

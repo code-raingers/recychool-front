@@ -57,8 +57,9 @@ S.SubFloatingButton2 = styled.div`
   justify-content: center;
 
   img{
-    width: 34px;
-    height: 34px;
+    margin: 0 0 0 3px;
+    width: 30px;
+    height: 30px;
   }
 `;
 

@@ -137,7 +137,7 @@ const FloatingButton = () => {
 
           {/* 행사 */}
           <S.SubFloatingButton2 onClick={handleEventClick}>
-            <img src="/assets/images/event.png" alt="행사" />
+            <img src="/assets/images/movie-icon.png" alt="행사" />
           </S.SubFloatingButton2>
 
           {/* 주차 */}
