@@ -4,21 +4,19 @@ import * as C from "../../styles/common";
 const S = {};
 
 /* =============================
- * Page / Layout (1160 fixed, Left 560 / Gap 160 / Right 440)
+ * Page / Layout
  * ============================= */
 S.Page = styled.div`
   width: 100%;
 `;
 
-/* 1160 고정 + 가운데 정렬 + 좌우 고정 폭 + 간격 160 */
 S.Grid = styled.div`
   width: 1160px;
   margin: 0 auto;
-  box-sizing: border-box;
-
   display: flex;
   align-items: flex-start;
   gap: 160px;
+  box-sizing: border-box;
 `;
 
 S.Left = styled.section`
@@ -32,14 +30,14 @@ S.Right = styled.aside`
 `;
 
 /* =============================
- * Left (No card, just sections)
+ * Left Sections
  * ============================= */
 S.LeftWrap = styled.div`
   padding-top: 40px;
 `;
 
 S.Block = styled.section`
-  margin-bottom: 56px;
+  margin-bottom: 64px;
 `;
 
 S.BlockTitle = styled.h2`
@@ -50,42 +48,45 @@ S.BlockTitle = styled.h2`
 `;
 
 S.BlockLine = styled.div`
-  width: 100%;
   height: 1px;
   background: #e9e9e9;
 `;
 
-/* 이용자 정보 - 2컬럼(라벨/값) */
+/* 이용자 정보 */
 S.InfoGrid = styled.div`
-  margin-top: 28px;
+  margin-top: 26px;
   display: grid;
   grid-template-columns: 120px 1fr;
-  row-gap: 32px;
+  row-gap: 22px;
+  align-items: center;
 `;
 
 S.InfoLabel = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 700;
   color: #111;
 `;
 
 S.InfoValue = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
 `;
 
-/* 결제 방법 선택 */
+/* =============================
+ * 결제 방법 선택
+ * ============================= */
 S.PayList = styled.div`
-  margin-top: 28px;
+  margin-top: 26px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: 28px;
 `;
 
 S.PayRow = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  padding: 6px 0;
   cursor: pointer;
 `;
 
@@ -96,34 +97,18 @@ S.PayLeft = styled.div`
 `;
 
 S.PayIcon = styled.div`
-  width: 64px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 64px;
-  overflow: hidden;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
 `;
 
 S.PayIconImg = styled.img`
-  max-width: 100%;
-  max-height: 100%;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   display: block;
-
-  /* 기본 */
-  transform: scale(0.62);
-  transform-origin: center;
-
-  /* 토스 */
-  &[data-pay="toss"] {
-    transform: scale(1.5);
-  }
-
-  /* 카카오 */
-  &[data-pay="kakao"] {
-    transform: scale(0.68);
-  }
 `;
 
 S.PayText = styled.div`
@@ -132,12 +117,12 @@ S.PayText = styled.div`
   color: #111;
 `;
 
-/* 피그마 느낌 라디오 */
+/* 라디오 */
 S.RadioOuter = styled.div`
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 999px;
-  border: 2px solid ${(p) => (p.$checked ? "#111" : "#bdbdbd")};
+  border: 2px solid ${(p) => (p.$checked ? "#111" : "#c9c9c9")};
   display: grid;
   place-items: center;
   box-sizing: border-box;
@@ -150,22 +135,25 @@ S.RadioInner = styled.div`
   background: ${(p) => (p.$checked ? "#111" : "transparent")};
 `;
 
-/* 환불 규정 */
+/* =============================
+ * 환불 규정
+ * ============================= */
 S.RefundGrid = styled.div`
-  margin-top: 28px;
+  margin-top: 26px;
   display: grid;
-  grid-template-columns: 140px 1fr;
-  row-gap: 28px;
+  grid-template-columns: 120px 1fr;
+  row-gap: 18px;
+  align-items: center;
 `;
 
 S.RefundLeft = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: #111;
 `;
 
 S.RefundRight = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
 `;
 
@@ -179,46 +167,45 @@ S.SummarySticky = styled.div`
 `;
 
 S.SummaryCard = styled.div`
-  width: 100%;
   border: 1px solid #dcdcdc;
   border-radius: 24px;
-  padding: 38px 36px;
-  box-sizing: border-box;
+  padding: 36px 32px;
   background: #fff;
+  box-sizing: border-box;
 `;
 
 S.SummaryTitle = styled.h2`
-  margin: 0 0 18px;
-  font-size: 28px;
+  margin: 0 0 16px;
+  font-size: 26px;
   font-weight: 900;
   color: #111;
 `;
 
 S.SummaryLine = styled.div`
-  width: 100%;
   height: 1px;
   background: #e9e9e9;
-  margin-bottom: 26px;
+  margin-bottom: 24px;
 `;
 
 S.SummaryGrid = styled.div`
   display: grid;
-  grid-template-columns: 140px 1fr;
-  row-gap: 28px;
-  column-gap: 24px;
-  align-items: center;
+  grid-template-columns: 120px 1fr;
+  row-gap: 20px;
+  column-gap: 18px;
 `;
 
 S.SummaryKey = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 800;
   color: #111;
+  line-height: 1.4;
 `;
 
 S.SummaryVal = styled.div`
-  font-size: 16px;
+  font-size: 15px;
   color: #666;
   text-align: right;
+  line-height: 1.4;
 `;
 
 S.SummaryValPrice = styled.div`
@@ -229,25 +216,25 @@ S.SummaryValPrice = styled.div`
 
 S.PayButton = styled.button`
   width: 100%;
-  height: 64px;
-  margin-top: 44px;
+  height: 60px;
+  margin-top: 36px;
   border: none;
-  border-radius: 10px;
-  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
+  border-radius: 12px;
+  background: ${({ theme }) => theme.PALETTE.primary.green.main};
   color: #fff;
-  font-size: 20px;
-  font-weight: 900;
+  font-size: 18px;
+  font-weight: 800;
   cursor: pointer;
 `;
 
 /* =============================
- * CompleteConfirm 
+ * CompleteConfirm
  * ============================= */
 S.CompleteWrap = styled.div`
-  width: 920px;           
+  width: 920px;
   margin: 0 auto;
-  box-sizing: border-box;
   padding: 110px 0 140px;
+  box-sizing: border-box;
 `;
 
 S.CompleteCard = styled.section`
@@ -263,11 +250,9 @@ S.CompleteTitle = styled.h1`
 
 S.CompleteDivider = styled.div`
   margin-top: 20px;
-  width: 100%;
   height: 1px;
   background: rgba(0, 0, 0, 0.55);
 `;
-
 
 S.CompleteTable = styled.div`
   width: 100%;
@@ -295,17 +280,14 @@ S.CompleteTh = styled.div`
 S.CompleteTd = styled.div`
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   padding: 0 28px;
   font-size: 18px;
   font-weight: 600;
   color: #111;
 `;
 
-/* 버튼 */
 S.CompleteButtonRow = styled.div`
   margin-top: 80px;
-  width: 100%;
   display: flex;
   justify-content: center;
   gap: 48px;
@@ -315,11 +297,11 @@ S.CompletePrimaryButton = styled.button`
   width: 360px;
   height: 56px;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px;
   font-size: 18px;
+  font-weight: 800;
   cursor: pointer;
-  background-color: ${({ theme }) => theme.PALETTE.primary.green.main};
+  background: ${({ theme }) => theme.PALETTE.primary.green.main};
   color: #fff;
 `;
 
@@ -327,11 +309,11 @@ S.CompleteSecondaryButton = styled.button`
   width: 360px;
   height: 56px;
   border: none;
-  border-radius: 8px;
-  font-weight: 600;
+  border-radius: 12px;
   font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
-  background-color: #EFFBEA;
+  background: #effbea;
   color: rgba(0, 0, 0, 0.75);
 `;
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import S from "./style";
 
 const formatKoreanDate = (yyyyMMdd) => {
@@ -14,11 +14,14 @@ const formatRange = (start, end) => {
   return `${formatKoreanDate(start)} - ${formatKoreanDate(end)}`;
 };
 
-const ENABLE_DAYS_BEFORE = 7;
+const ENABLE_DAYS_BEFORE = 60;
 
 const CompleteConfirm = () => {
   const navigate = useNavigate();
   const { reserveId } = useParams();
+  const [searchParams] = useSearchParams();
+
+  const isExtend = searchParams.get("extend") === "true";
 
   const [dto, setDto] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -39,7 +42,7 @@ const CompleteConfirm = () => {
         );
 
 
-
+ 
         if (!res.ok) {
           console.log("예약 조회 실패", res.status);
           setDto(null);
